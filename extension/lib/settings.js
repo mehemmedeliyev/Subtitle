@@ -5,7 +5,9 @@
     enabled: true,
     mode: 'subtitle', // 'subtitle' = translate the video's subtitles, 'audio' = listen to the speech
     targetLang: 'az', // 'az' | 'tr'
-    provider: 'google', // 'google' (free) | 'claude' (API key, best quality)
+    provider: 'google', // 'google' (free, no key) | 'groq' (free key, AI) | 'claude' (paid key, best quality)
+    groqKey: '', // shared with speech recognition when sttProvider is 'groq'
+    groqModel: '',
     claudeKey: '',
     claudeModel: 'claude-opus-5',
     sttProvider: 'groq', // speech recognition: 'groq' | 'openai'

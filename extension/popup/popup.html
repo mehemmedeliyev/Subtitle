@@ -91,8 +91,17 @@
   <section>
     <h2>Tərcümə keyfiyyəti</h2>
     <div class="seg small" data-radio="provider">
-      <button data-value="google">Google (pulsuz)</button>
-      <button data-value="claude">Claude AI (ən yaxşı)</button>
+      <button data-value="google">Google<br><small>pulsuz</small></button>
+      <button data-value="groq">Groq AI<br><small>pulsuz, əla</small></button>
+      <button data-value="claude">Claude AI<br><small>pullu, ən yaxşı</small></button>
+    </div>
+    <p class="hint" data-show="provider=google">Açarsız işləyir, amma sözbəsöz tərcümə edir. Daha yaxşı nəticə üçün <b>Groq AI</b> seçin – o da pulsuzdur.</p>
+    <div data-show="provider=groq">
+      <label class="field">
+        <span>Groq API açarı</span>
+        <input type="password" data-key="groqKey" placeholder="gsk_…" autocomplete="off">
+      </label>
+      <p class="hint">Süni intellekt kontekstə baxıb mənanı tərcümə edir. Açar pulsuzdur: <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a>. Səs tanıma ilə <b>eyni açardır</b> – birində yazmaq kifayətdir. Limit dolsa avtomatik Google-a keçir.</p>
     </div>
     <div data-show="provider=claude">
       <label class="field">

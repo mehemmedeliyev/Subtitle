@@ -57,7 +57,11 @@ function bind() {
       if (el.type === 'checkbox') v = el.checked;
       else if (el.type === 'range') v = parseFloat(el.value);
       else v = el.value.trim();
-      save({ [k]: v });
+      const patch = { [k]: v };
+      // The free Groq key works for both speech recognition and translation.
+      if (k === 'sttKey' && settings.sttProvider === 'groq' && !settings.groqKey) patch.groqKey = v;
+      if (k === 'groqKey' && settings.sttProvider === 'groq' && !settings.sttKey) patch.sttKey = v;
+      save(patch);
     });
   });
   $$('[data-radio]').forEach((group) => {
@@ -134,7 +138,7 @@ async function updateAudioState() {
 }
 
 async function startAudio() {
-  if (!settings.sttKey) {
+  if (!settings.sttKey && !(settings.sttProvider === 'groq' && settings.groqKey)) {
     $('#audioState').textContent = 'Əvvəlcə səs tanıma API açarını daxil edin.';
     return;
   }

@@ -442,7 +442,7 @@
   }
 
   function batchSize() {
-    return settings.provider === 'claude' ? 15 : 6;
+    return settings.provider === 'google' ? 6 : 15;
   }
 
   function prefetchAround() {

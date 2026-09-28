@@ -36,7 +36,7 @@ Gumroad kurslarındakı **ingiliscə altyazını** və ya **danışığı (səsi
 3. Video oynadıqca hər cümlə bitəndə tərcümə görünür (≈1–2 saniyə gecikmə ilə).
 
 ### Daha yaxşı tərcümə keyfiyyəti (istəyə görə)
-Standart olaraq pulsuz Google Translate işləyir. **Claude AI** seçib Anthropic API açarı daxil etsəniz, tərcümə kontekstə baxaraq edilir: danışıq dili, idiomlar, texniki terminlər (məs. *Shader Editor*, *Area light*) daha təbii və düzgün olur. Claude xəta versə avtomatik Google-a keçir.
+Standart olaraq pulsuz Google Translate işləyir (sözbəsöz). **Groq AI** seçsəniz, pulsuz süni intellekt kontekstə baxıb mənanı tərcümə edir – səs tanıma ilə eyni pulsuz Groq açarı işlədilir. **Claude AI** (pullu) seçib Anthropic API açarı daxil etsəniz, tərcümə kontekstə baxaraq edilir: danışıq dili, idiomlar, texniki terminlər (məs. *Shader Editor*, *Area light*) daha təbii və düzgün olur. Claude xəta versə avtomatik Google-a keçir.
 
 ## Qısayollar
 

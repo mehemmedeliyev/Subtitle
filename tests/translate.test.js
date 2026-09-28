@@ -19,6 +19,16 @@ sandbox.fetch = async (url, opts) => {
       content: [{ type: 'text', text: JSON.stringify({ translations: sentences.map((s) => 'C:' + s) }) }],
     }) };
   }
+  if (url.startsWith('https://api.groq.com')) {
+    const body = JSON.parse(opts.body);
+    if (body.model === 'openai/gpt-oss-120b') {
+      return { ok: false, status: 404, headers: { get: () => null }, json: async () => ({ error: { message: 'model decommissioned' } }) };
+    }
+    const { sentences } = JSON.parse(body.messages[1].content);
+    return { ok: true, status: 200, headers: { get: () => null }, json: async () => ({
+      choices: [{ message: { content: JSON.stringify({ translations: sentences.map((s) => 'Q:' + s) }) } }],
+    }) };
+  }
   const q = new URL(url).searchParams.get('q');
   return { ok: true, status: 200, json: async () => [[['G:' + q, q]]] };
 };
@@ -43,6 +53,15 @@ const T = sandbox.GTTranslate;
   assert.strictEqual(body.output_config.format.type, 'json_schema');
   assert.strictEqual(req.opts.headers['anthropic-dangerous-direct-browser-access'], 'true');
   assert.ok(body.system.includes('Turkish'));
+
+  // Groq (free AI): shares the speech-recognition key; retired model → next model.
+  calls.length = 0;
+  r = await T.translateBatch(['Groq one.', 'Groq two.'], ['ctx.'], { provider: 'groq', sttProvider: 'groq', sttKey: 'gsk', targetLang: 'az' });
+  assert.deepStrictEqual([...r.translations], ['Q:Groq one.', 'Q:Groq two.']);
+  const g = calls.filter((c) => c.url.includes('groq'));
+  assert.strictEqual(g.length, 2, 'first model retired, second used');
+  assert.strictEqual(g[0].opts.headers.authorization, 'Bearer gsk');
+  assert.strictEqual(JSON.parse(g[1].opts.body).model, 'llama-3.3-70b-versatile');
 
   claudeMode = 'error';
   r = await T.translateBatch(['New sentence.'], [], { provider: 'claude', claudeKey: 'bad', targetLang: 'az' });

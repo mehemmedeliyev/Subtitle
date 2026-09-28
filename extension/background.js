@@ -49,7 +49,9 @@ async function startAudio(tabId, streamId) {
   if (current.tabId != null && current.status !== 'idle') await stopAudio();
 
   const settings = await getSettings();
-  if (!settings.sttKey) throw new Error('Səs tanıma üçün API açarı daxil edin (Groq pulsuzdur).');
+  // One free Groq key serves both speech recognition and AI translation.
+  const sttKey = (settings.sttKey || (settings.sttProvider === 'groq' ? settings.groqKey : '') || '').trim();
+  if (!sttKey) throw new Error('Səs tanıma üçün API açarı daxil edin (Groq pulsuzdur).');
 
   if (!(await hasOffscreen())) {
     await chrome.offscreen.createDocument({
@@ -64,7 +66,7 @@ async function startAudio(tabId, streamId) {
     streamId,
     stt: {
       provider: settings.sttProvider,
-      key: settings.sttKey,
+      key: sttKey,
       model: settings.sttModel || self.GTSttModels[settings.sttProvider][0],
     },
   });

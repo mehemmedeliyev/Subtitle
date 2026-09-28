@@ -85,7 +85,7 @@
     additionalProperties: false,
   };
 
-  function claudeSystem(target) {
+  function systemPrompt(target) {
     const lang = LANG_NAMES[target] || target;
     return [
       'You translate English video subtitles (online course / tutorial speech) into ' + lang + '.',
@@ -104,7 +104,7 @@
     const body = {
       model: settings.claudeModel || 'claude-opus-5',
       max_tokens: 16000,
-      system: claudeSystem(target),
+      system: systemPrompt(target),
       output_config: {
         effort: 'low',
         format: { type: 'json_schema', schema: CLAUDE_SCHEMA },
@@ -145,6 +145,64 @@
     return list.map((s) => String(s).trim());
   }
 
+  // Free AI translation through Groq (same free key as speech recognition).
+  // If a model is retired, the next one in the list is tried.
+  const GROQ_MODELS = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile'];
+
+  function groqKey(settings) {
+    return (settings.groqKey || (settings.sttProvider === 'groq' ? settings.sttKey : '') || '').trim();
+  }
+
+  async function groqTranslate(texts, context, target, settings) {
+    const key = groqKey(settings);
+    if (!key) throw new Error('Groq API açarı yoxdur');
+    const models = settings.groqModel ? [settings.groqModel].concat(GROQ_MODELS.filter((m) => m !== settings.groqModel)) : GROQ_MODELS;
+    let lastErr;
+    for (const model of models) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const body = {
+          model,
+          temperature: 0.2,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: systemPrompt(target) + '\nAnswer only with JSON: {"translations": ["...", ...]}.' },
+            { role: 'user', content: JSON.stringify({ context: context || [], sentences: texts }) },
+          ],
+        };
+        if (/gpt-oss/.test(model)) body.reasoning_effort = 'low';
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 429 || res.status >= 500) {
+          // Free-tier rate limit: wait as told, then retry.
+          const wait = parseFloat(res.headers.get('retry-after')) || 2 * (attempt + 1);
+          lastErr = new Error('Groq limit (HTTP ' + res.status + ')');
+          await new Promise((r) => setTimeout(r, Math.min(8, wait) * 1000));
+          continue;
+        }
+        if (!res.ok) {
+          let msg = 'Groq HTTP ' + res.status;
+          try {
+            const err = await res.json();
+            if (err && err.error && err.error.message) msg += ': ' + err.error.message;
+          } catch (_) { /* ignore */ }
+          if (res.status === 401) throw new Error('Groq API açarı yanlışdır (401)');
+          lastErr = new Error(msg);
+          break; // e.g. model retired – try the next model
+        }
+        const data = await res.json();
+        const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+        let list;
+        try { list = JSON.parse(content).translations; } catch (_) { list = null; }
+        if (Array.isArray(list) && list.length === texts.length) return list.map((s) => String(s).trim());
+        lastErr = new Error('Groq returned ' + (Array.isArray(list) ? list.length : 0) + ' of ' + texts.length + ' translations');
+      }
+    }
+    throw lastErr;
+  }
+
   /**
    * Translate `texts` (array of complete sentences). Returns
    * { translations: string[], provider, warning? }.
@@ -165,9 +223,11 @@
     let translated;
     let used = provider;
     let warning;
-    if (provider === 'claude') {
+    if (provider === 'claude' || provider === 'groq') {
       try {
-        translated = await claudeTranslate(todo, context, target, settings);
+        translated = provider === 'claude'
+          ? await claudeTranslate(todo, context, target, settings)
+          : await groqTranslate(todo, context, target, settings);
       } catch (e) {
         warning = String(e.message || e);
         used = 'google';

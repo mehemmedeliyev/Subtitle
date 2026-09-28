@@ -1,0 +1,12 @@
+<!doctype html><html><body style="margin:0;background:#222">
+<div class="jwplayer" id="player" style="position:relative;width:800px;height:450px;margin:40px">
+  <video id="v" src="silence.wav" style="width:800px;height:450px;background:#000" preload="auto"></video>
+  <div class="jw-captions" style="position:absolute;bottom:40px;width:100%;text-align:center;color:#fff;font-size:22px"><span class="jw-text-track-cue"></span></div>
+</div>
+<script>
+  // Mimics JW Player: downloads the VTT itself and draws captions in its own DOM.
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', 'subs.vtt');
+  xhr.send();
+</script>
+</body></html>

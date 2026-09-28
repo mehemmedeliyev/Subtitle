@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Altyazı Tərcüməçi – Gumroad",
+  "short_name": "Altyazı Tərcüməçi",
+  "version": "1.0.0",
+  "description": "Gumroad kurslarındakı ingiliscə altyazı və danışığı tam cümlələrlə Azərbaycan və Türk dilinə tərcümə edir.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Altyazı Tərcüməçi",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "tabCapture", "offscreen", "scripting", "activeTab"],
+  "host_permissions": [
+    "*://*.gumroad.com/*",
+    "https://translate.googleapis.com/*",
+    "https://clients5.google.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.groq.com/*",
+    "https://api.openai.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.gumroad.com/*"],
+      "js": ["content/page-hook.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": ["*://*.gumroad.com/*"],
+      "js": ["lib/settings.js", "lib/sentences.js", "content/content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "minimum_chrome_version": "116"
+}

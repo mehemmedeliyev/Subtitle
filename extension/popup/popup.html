@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8">
+  <title>Altyazı Tərcüməçi</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div class="title">
+      <img src="../icons/icon32.png" alt="">
+      <span>Altyazı Tərcüməçi</span>
+    </div>
+    <label class="switch" title="Aktiv / deaktiv (Alt+Shift+S)">
+      <input type="checkbox" data-key="enabled">
+      <span></span>
+    </label>
+  </header>
+
+  <div id="status" class="status">Yoxlanılır…</div>
+  <button id="inject" class="btn ghost hidden">Bu səhifədə işə sal</button>
+
+  <section>
+    <h2>Rejim</h2>
+    <div class="seg" data-radio="mode">
+      <button data-value="subtitle">📝 Altyazı tərcüməsi</button>
+      <button data-value="audio">🎧 Səs tərcüməsi</button>
+    </div>
+    <p class="hint" data-show="mode=subtitle">Videonun ingiliscə altyazısı götürülür, cümlələr <b>tam bitəndən sonra</b> tərcümə olunur.</p>
+    <p class="hint" data-show="mode=audio">Danışıq tanınır (bütün aksentlər), hər cümlə deyilib qurtaran kimi tərcümə göstərilir. Altyazısı olmayan videolar üçün.</p>
+  </section>
+
+  <section>
+    <h2>Dil</h2>
+    <div class="seg" data-radio="targetLang">
+      <button data-value="az">🇦🇿 Azərbaycanca</button>
+      <button data-value="tr">🇹🇷 Türkçe</button>
+    </div>
+  </section>
+
+  <section data-show="mode=audio" class="card">
+    <h2>Səs tanıma</h2>
+    <div class="seg small" data-radio="sttProvider">
+      <button data-value="groq">Groq (pulsuz)</button>
+      <button data-value="openai">OpenAI</button>
+    </div>
+    <label class="field">
+      <span>API açarı</span>
+      <input type="password" data-key="sttKey" placeholder="gsk_… və ya sk-…" autocomplete="off">
+    </label>
+    <p class="hint" data-show="sttProvider=groq">Pulsuz açar: <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></p>
+    <label class="field">
+      <span>Model</span>
+      <select data-key="sttModel" id="sttModel"></select>
+    </label>
+    <div class="row">
+      <button id="audioStart" class="btn primary">▶ Başlat</button>
+      <button id="audioStop" class="btn">■ Dayandır</button>
+    </div>
+    <div id="audioState" class="hint"></div>
+  </section>
+
+  <section>
+    <h2>Görünüş</h2>
+    <label class="range">
+      <span>Yazı ölçüsü <b id="fontSizeVal"></b></span>
+      <div class="row">
+        <button class="btn mini" data-step="fontSize:-2">A−</button>
+        <input type="range" min="12" max="72" step="1" data-key="fontSize">
+        <button class="btn mini" data-step="fontSize:2">A+</button>
+      </div>
+    </label>
+    <label class="range">
+      <span>Sətir eni <b id="lineWidthVal"></b></span>
+      <input type="range" min="30" max="100" step="5" data-key="lineWidth">
+    </label>
+    <label class="range">
+      <span>Ekranda qalan əvvəlki cümlələr <b id="historyCountVal"></b></span>
+      <input type="range" min="0" max="3" step="1" data-key="historyCount">
+    </label>
+    <label class="range">
+      <span>Fon qaranlığı <b id="bgOpacityVal"></b></span>
+      <input type="range" min="0" max="1" step="0.05" data-key="bgOpacity">
+    </label>
+    <label class="check"><input type="checkbox" data-key="showOriginal"> İngiliscə orijinalı da göstər</label>
+    <label class="check"><input type="checkbox" data-key="hideSiteSubs"> Saytın öz ingiliscə altyazısını gizlət</label>
+    <label class="check"><input type="checkbox" data-key="autoScale"> Video böyüdükcə yazını da böyüt (full screen)</label>
+    <p class="hint">Altyazını siçanla sürüşdürüb yerini dəyişə bilərsiniz. Qısayollar: <b>Alt+Shift+↑/↓</b> ölçü, <b>Alt+Shift+E</b> orijinal, <b>Alt+Shift+L</b> dil.</p>
+  </section>
+
+  <section>
+    <h2>Tərcümə keyfiyyəti</h2>
+    <div class="seg small" data-radio="provider">
+      <button data-value="google">Google (pulsuz)</button>
+      <button data-value="claude">Claude AI (ən yaxşı)</button>
+    </div>
+    <div data-show="provider=claude">
+      <label class="field">
+        <span>Anthropic API açarı</span>
+        <input type="password" data-key="claudeKey" placeholder="sk-ant-…" autocomplete="off">
+      </label>
+      <p class="hint">Kontekstə baxaraq təbii tərcümə edir; texniki terminləri qoruyur. Açar: <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>. Xəta olsa avtomatik Google-a keçir.</p>
+    </div>
+  </section>
+
+  <script src="../lib/settings.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

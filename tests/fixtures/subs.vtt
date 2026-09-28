@@ -1,0 +1,17 @@
+WEBVTT
+
+1
+00:00:00.500 --> 00:00:03.000
+well, it makes sense to talk about brightnesses or
+
+2
+00:00:03.000 --> 00:00:06.000
+light ratios when there's more than one light in
+
+3
+00:00:06.000 --> 00:00:08.000
+the scene. So let's add a second
+
+4
+00:00:08.000 --> 00:00:11.000
+light. Now we render it.

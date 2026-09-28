@@ -1,0 +1,11 @@
+{
+  "name": "gumroad-subtitle-translator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome extension: translates English course subtitles / speech into Azerbaijani and Turkish, sentence by sentence.",
+  "scripts": {
+    "test": "node tests/sentences.test.js && node tests/translate.test.js && node tests/audio.test.js",
+    "test:e2e": "PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS=1 node tests/e2e.mjs",
+    "icons": "python3 tests/make_icons.py"
+  }
+}
